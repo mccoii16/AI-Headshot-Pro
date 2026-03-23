@@ -33,7 +33,7 @@ export default function App() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Look closely at the below - that is what was missing!
-    const file = e.target.files?.; 
+   const file = e.target.files?.[0];
     
     if (file) {
       setSelectedFile(file);
