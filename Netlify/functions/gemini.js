@@ -1,15 +1,28 @@
-import { GoogleGenAI } from '@google/genai'; // Using the latest 2026 SDK
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-export default async (req, context) => {
-  const { prompt } = await req.json();
+exports.handler = async (event, context) => {
+  // 1. Get the prompt from your frontend
+  const { prompt } = JSON.parse(event.body);
 
-  // The Gateway automatically provides auth; no key needed here!
-  const ai = new GoogleGenAI({}); 
+  // 2. Access your API Key securely from Netlify's environment
+  // (We will set this up in the Netlify Dashboard in a second)
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-3.1-flash-lite-preview', // Or your preferred version
-    contents: prompt 
-  });
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
 
-  return Response.json(response);
+    // 3. Send the AI's answer back to your frontend
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ reply: text }),
+    };
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message }),
+    };
+  }
 };
