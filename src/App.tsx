@@ -25,7 +25,7 @@ const STYLES = [
 export default function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [selectedStyle, setSelectedStyle] = useState(STYLES);
+ const [selectedStyle, setSelectedStyle] = useState(STYLES[0]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +47,7 @@ export default function App() {
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve((reader.result as string).split(','));
+      reader.onload = () => resolve((reader.result as string).split(',')[1]);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
