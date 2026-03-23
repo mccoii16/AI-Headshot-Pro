@@ -87,21 +87,24 @@ export default function App() {
   };
 
   // Logic to call your Netlify Function
-  const generateHeadshot = async () => {
+ const generateHeadshot = async () => {
     if (!selectedFile) return;
 
     setIsGenerating(true);
     setError(null);
 
     try {
-      // We call the Netlify Function endpoint instead of the Google SDK directly
+      // 1. Convert the file to Base64 so we can send it to the function
+      const base64Data = await fileToBase64(selectedFile);
+
+      // 2. Call the Netlify function
       const response = await fetch('/.netlify/functions/gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          stylePrompt: selectedStyle.prompt,
-          // In a real app, you'd send the image to Gemini Vision first to describe the person
-          // For this free version, we'll send the style to our function
+          base64Data: base64Data,
+          mimeType: selectedFile.type,
+          stylePrompt: selectedStyle.prompt 
         }),
       });
 
@@ -114,7 +117,7 @@ export default function App() {
       }
     } catch (err: any) {
       console.error("Generation error:", err);
-      setError("Quota reached or connection lost. Please try again in a few seconds.");
+      setError("AI is busy or the image is too large. Please try again in a moment.");
     } finally {
       setIsGenerating(false);
     }
