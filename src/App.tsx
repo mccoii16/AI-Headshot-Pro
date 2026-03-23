@@ -32,7 +32,9 @@ export default function App() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.; // Fixed the typo here
+    // Look closely at the below - that is what was missing!
+    const file = e.target.files?.; 
+    
     if (file) {
       setSelectedFile(file);
       const reader = new FileReader();
